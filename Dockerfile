@@ -1,13 +1,14 @@
-# DataIQ MCP Dockerfile (Render-ready)
+# DataIQ MCP Dockerfile (Render stable)
 FROM acuvity/mcp-server-postgres:latest
 
-# Force the service to bind on 8000 (Render health will check here)
+# Set environment variables before entrypoint
+ENV DATABASE_URI=""
+ENV READ_ONLY=true
 ENV PORT=8000
-# Turn off the internal metrics server (prevents port 8080 from opening)
 ENV DISABLE_METRICS=true
 
-# Expose only the port we actually use
+# Expose only port 8000
 EXPOSE 8000
 
-# Start the MCP server bound to 8000
-CMD ["sh", "-c", "exec /app/.venv/bin/postgres-mcp --port 8000"]
+# Explicitly disable metrics server and bind to port 8000
+CMD ["sh", "-c", "exec /app/.venv/bin/postgres-mcp --port 8000 --disable-metrics"]
