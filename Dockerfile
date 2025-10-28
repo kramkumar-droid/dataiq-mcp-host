@@ -1,14 +1,14 @@
-# DataIQ MCP Dockerfile (Render stable)
+# dataiq-mcp-host/Dockerfile
 FROM acuvity/mcp-server-postgres:latest
 
-# Set environment variables before entrypoint
-ENV DATABASE_URI=""
-ENV READ_ONLY=true
-ENV PORT=8000
+# Make the app honor $PORT. If PORT isn’t set, default to 10000.
+ENV PORT=10000
+
+# Optional: silence the metrics listener noise
 ENV DISABLE_METRICS=true
 
-# Expose only port 8000
-EXPOSE 8000
+# Expose the same port Render will hit
+EXPOSE 10000
 
-# Explicitly disable metrics server and bind to port 8000
-CMD ["sh", "-c", "exec /app/.venv/bin/postgres-mcp --port 8000 --disable-metrics"]
+# IMPORTANT: pass the port through to the MCP server so the Minibridge frontend binds to $PORT
+CMD ["sh", "-c", "exec /app/.venv/bin/postgres-mcp --port ${PORT} --disable-metrics"]
