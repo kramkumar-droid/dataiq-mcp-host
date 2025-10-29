@@ -1,14 +1,14 @@
 # dataiq-mcp-host/Dockerfile
 FROM acuvity/mcp-server-postgres:latest
 
-# Respect Render’s PORT environment variable (default to 10000 if not set)
-ENV PORT=${PORT:-10000}
+# Respect Render’s PORT environment variable (default to 8000)
+ENV PORT=${PORT:-8000}
 
-# Optional: disable metrics to reduce log noise
+# Disable metrics entirely to avoid port 8080 conflicts
 ENV DISABLE_METRICS=true
 
-# Expose the port Render will check
+# Expose only the configured port
 EXPOSE ${PORT}
 
-# Start the MCP server bound to the same port
-CMD ["sh", "-c", "exec /app/.venv/bin/postgres-mcp --port ${PORT} --disable-metrics"]
+# Bind both the MCP backend and frontend to the same port
+CMD ["sh", "-c", "exec /app/.venv/bin/postgres-mcp --port ${PORT} --frontend-port ${PORT} --disable-metrics"]
