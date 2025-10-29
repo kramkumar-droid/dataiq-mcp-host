@@ -1,14 +1,7 @@
-# DataIQ MCP for Render
 FROM acuvity/mcp-server-postgres:latest
 
-# Install socat for TCP forwarding
-USER root
-RUN apk add --no-cache socat
-
-# Environment variables
-ENV PORT=10000
-ENV DISABLE_METRICS=true
+# Don’t need socat at all
 EXPOSE 10000
 
-# Start MCP and forward port 10000 → 8000
-CMD ["sh", "-c", "socat TCP-LISTEN:${PORT},fork,reuseaddr,bind=0.0.0.0 TCP:127.0.0.1:8000 & exec /app/.venv/bin/postgres-mcp --port 8000 --disable-metrics --log-level debug"]
+# Run postgres-mcp directly on Render's injected port
+CMD ["sh", "-c", "exec /app/.venv/bin/postgres-mcp --port ${PORT} --disable-metrics --log-level debug"]
