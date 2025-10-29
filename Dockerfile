@@ -1,20 +1,17 @@
 # dataiq-mcp-host/Dockerfile
 FROM acuvity/mcp-server-postgres:latest
 
-# Render expects your app to listen on $PORT (default 10000)
+# Render expects a public listener
 ENV PORT=10000
 
-# Temporarily switch to root to install socat
+# Switch to root temporarily for install
 USER root
-
-# Install socat (for TCP forwarding)
 RUN apk add --no-cache socat
-
-# Drop back to the original non-root user (important for security)
 USER app
 
-# Expose the public port Render expects
+# Expose Render's expected port
 EXPOSE 10000
 
-# Forward Render’s $PORT → internal MCP (8000)
-ENTRYPOINT ["/bin/sh", "-lc", "socat TCP-LISTEN:${PORT},fork,reuseaddr TCP:127.0.0.1:8000 & exec /entrypoint.sh"]
+# Start socat to forward external $PORT → internal MCP port :8000
+# and then run the MCP server itself (non-blocking)
+CMD ["sh", "-c", "socat TCP-LISTEN:${PORT},fork,reuseaddr TCP:127.0.0.1:8000 & exec /app/.venv/bin/postgres-mcp --port 8000 --disable-metrics"]
