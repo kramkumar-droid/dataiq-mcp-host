@@ -11,4 +11,4 @@ ENV DISABLE_METRICS=true
 EXPOSE 10000
 
 # Start MCP and forward port 10000 → 8000
-CMD ["sh", "-c", "socat TCP-LISTEN:${PORT},fork,reuseaddr TCP:127.0.0.1:8000 & exec /app/.venv/bin/postgres-mcp --port 8000 --disable-metrics --log-level debug"]
+CMD ["sh", "-c", "socat TCP-LISTEN:${PORT},fork,reuseaddr,bind=0.0.0.0 TCP:127.0.0.1:8000 & exec /app/.venv/bin/postgres-mcp --port 8000 --disable-metrics --log-level debug"]
