@@ -1,7 +1,7 @@
 FROM acuvity/mcp-server-postgres:latest
 
-# Don’t need socat at all
-EXPOSE 10000
+# MCP listens on port 8000 by default
+EXPOSE 8000
 
-# Run postgres-mcp directly on Render's injected port
-CMD ["sh", "-c", "exec /app/.venv/bin/postgres-mcp --port ${PORT} --disable-metrics --log-level debug"]
+# Run postgres-mcp directly on the same port
+CMD ["sh", "-c", "exec /app/.venv/bin/postgres-mcp --port 8000 --disable-metrics --log-level debug"]
