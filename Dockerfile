@@ -11,4 +11,4 @@ ENV DISABLE_METRICS=true
 EXPOSE 10000
 
 # IMPORTANT: pass the port through to the MCP server so the Minibridge frontend binds to $PORT
-CMD ["sh", "-c", "exec /app/.venv/bin/postgres-mcp --port ${PORT} --disable-metrics"]
+CMD ["sh", "-c", "exec /app/.venv/bin/postgres-mcp --port ${PORT:-8000} --disable-metrics"]
