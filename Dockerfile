@@ -1,14 +1,15 @@
 # dataiq-mcp-host/Dockerfile
 FROM acuvity/mcp-server-postgres:latest
 
-# Respect Render’s PORT environment variable (default to 8000)
-ENV PORT=${PORT:-8000}
+# Render expects your app to listen on $PORT (we'll set it to 10000 in Render)
+ENV PORT=10000
 
-# Disable metrics entirely to avoid port 8080 conflicts
-ENV DISABLE_METRICS=true
+# Install a tiny TCP proxy
+RUN apt-get update && apt-get install -y --no-install-recommends socat && rm -rf /var/lib/apt/lists/*
 
-# Expose only the configured port
-EXPOSE ${PORT}
+# Expose the public port Render will scan
+EXPOSE 10000
 
-# Bind both the MCP backend and frontend to the same port
-CMD ["sh", "-c", "exec /app/.venv/bin/postgres-mcp --port ${PORT} --frontend-port ${PORT} --disable-metrics"]
+# Start a listener on $PORT that forwards to the MCP frontend on :8000,
+# then launch the base image entrypoint which starts postgres-mcp (on 8000)
+ENTRYPOINT ["/bin/sh","-lc","socat TCP-LISTEN:${PORT},fork,reuseaddr TCP:127.0.0.1:8000 & exec /entrypoint.sh"]
